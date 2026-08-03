@@ -1,0 +1,17 @@
+
+# Daten nicht ins Repo pushen (GDPR/DSGVO Bewusstsein zeigen!)
+data/*.csv
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+# Models (zu groß für Git, besser via Git LFS oder Cloud)
+models/*.pkl
+# IDE
+.vscode/
+.idea/
