@@ -1,14 +1,46 @@
 # Predictive Maintenance
-
-Machine-Learning-Projekt zur **Vorhersage von Maschinenausfällen** (Predictive Maintenance). Die Pipeline lädt Sensordaten, bereitet Features auf, trainiert ein Random-Forest-Modell und speichert Modell sowie Preprocessor für spätere Inferenz.
-
-Datenbasis ist der öffentliche Datensatz **AI4I 2020** (UCI Machine Learning Repository).
+In der modernen Industrie sind ungeplante Maschinenstillstände ein massiver Kostenfaktor. Dieses Projekt implementiert eine vollständige Machine-Learning-Pipeline für **Predictive Maintenance** (vorausschauende Instandhaltung), um Maschinenausfälle frühzeitig zu erkennen, bevor sie eintreten. Basierend auf realistischen Sensordaten des AI4I 2020 Datensatzes analysiert das System Temperatur, Drehzahl und Werkzeugverschleiß, um das Ausfallrisiko präzise vorherzusagen. Dabei liegt der Fokus auf der Bewältigung typischer Praxis-Herausforderungen wie extrem unbalancierter Daten und der strikten Vermeidung von Data Leakage. Die resultierende, reproduzierbare Pipeline mündet in einem einsatzbereiten Random-Forest-Modell, das nahtlos in bestehende Produktionssysteme integriert werden kann.
 
 ## Ziele
 
 - Frühzeitig erkennen, ob eine Maschine ausfallen wird (`Machine failure`)
 - Mit unbalancierten Klassen umgehen (`class_weight='balanced'`, stratifizierter Split)
 - Reproduzierbare Pipeline mit Tests und optionaler Docker-Ausführung
+
+## Architektur
+
+```mermaid
+graph TD
+    classDef data fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef pipeline fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;
+    classDef artifact fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px;
+    classDef deploy fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+
+    subgraph Datenquelle
+        A[UCI AI4I 2020 Sensordaten]:::data
+    end
+
+    subgraph ML Pipeline [src/]
+        B[Data Loader]:::pipeline -->|Laden & lokales Caching| C[Preprocessing]:::pipeline
+        C -->|Scaling & One-Hot Encoding| D[Stratified Train/Test Split]:::pipeline
+        D --> E[Random Forest Training]:::pipeline
+        E -->|F1-Score Optimierung| F[Evaluation]:::pipeline
+    end
+
+    subgraph Persistenz [models/]
+        G[(rf_model.pkl)]:::artifact
+        H[(preprocessor.pkl)]:::artifact
+    end
+
+    subgraph Deployment
+        I[Docker Container / Inferenz]:::deploy
+    end
+
+    A --> B
+    F --> G & H
+    G & H --> I
+
+```
 
 ## Projektstruktur
 
